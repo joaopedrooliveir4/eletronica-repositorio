@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eletrônica Oliveira - Criar OS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <header class="text-center mb-4">
+            <h1>Eletrônica Oliveira</h1>
+            <h2>Criar uma nova OS</h2>
+        </header>
+
+        <form id="os-form" class="row g-3">
+            <div class="col-md-6">
+                <label for="numeroOS" class="form-label">Número da OS</label>
+                <input type="text" class="form-control" id="numeroOS" required>
+            </div>
+            <div class="col-md-6">
+                <label for="clienteNome" class="form-label">Nome do Cliente</label>
+                <input type="text" class="form-control" id="clienteNome" required>
+            </div>
+            <div class="col-md-6">
+                <label for="clienteTelefone" class="form-label">Telefone</label>
+                <input type="tel" class="form-control" id="clienteTelefone" required>
+            </div>
+            <div class="col-md-6">
+                <label for="aparelho" class="form-label">Aparelho</label>
+                <input type="text" class="form-control" id="aparelho" required>
+            </div>
+            <div class="col-md-6">
+                <label for="defeito" class="form-label">Defeito</label>
+                <input type="text" class="form-control" id="defeito" required>
+            </div>
+            <div class="col-md-12">
+                <label for="pecas" class="form-label">Peças para Troca</label>
+                <textarea class="form-control" id="pecas" rows="3"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label for="preco" class="form-label">Preço</label>
+                <input type="number" class="form-control" id="preco">
+            </div>
+            <div class="col-md-4">
+                <label for="aprovacao" class="form-label">Aprovação do Cliente</label>
+                <select id="aprovacao" class="form-select" required>
+                    <option value="pendente">Pendente</option>
+                    <option value="aprovado">Aprovado</option>
+                    <option value="não aprovado">Não Aprovado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="pagamento" class="form-label">Pagamento</label>
+                <select id="pagamento" class="form-select" required>
+                    <option value="pendente">Pendente</option>
+                    <option value="feito">Feito</option>
+                    <option value="não feito">Não Feito</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <label for="status" class="form-label">Status do Conserto</label>
+                <select id="status" class="form-select" required>
+                    <option value="orçamento a fazer">Orçamento a fazer</option>
+                    <option value="orçamento feito">Orçamento feito</option>
+                    <option value="conserto realizado">Conserto realizado</option>
+                    <option value="conserto não realizado">Conserto não realizado</option>
+                </select>
+            </div>
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save"></i> Salvar OS</button>
+            </div>
+        </form>
+    </div>
+    <div class="mt-5">
+        <h3>Ordens de Serviço Cadastradas</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Número OS</th>
+                    <th>Nome do Cliente</th>
+                    <th>Aparelho</th>
+                    <th>Defeito</th>
+                    <th>Peças</th>
+                    <th>Preço</th>
+                    <th>Aprovação</th>
+                    <th>Pagamento</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por Nome do Cliente, Aparelho, etc." onkeyup="filterOrders()">
+
+            <tbody id="ordersTableBody">
+                <!-- As ordens de serviço serão inseridas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('os-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const osData = {
+                numeroOS: document.getElementById('numeroOS').value,
+                clienteNome: document.getElementById('clienteNome').value,
+                clienteTelefone: document.getElementById('clienteTelefone').value,
+                aparelho: document.getElementById('aparelho').value,
+                defeito: document.getElementById('defeito').value,
+                pecas: document.getElementById('pecas').value,
+                preco: document.getElementById('preco').value,
+                aprovacao: document.getElementById('aprovacao').value,
+                pagamento: document.getElementById('pagamento').value,
+                status: document.getElementById('status').value
+            };
+
+            axios.post('http://localhost:3000/routes/orders', osData)
+                .then(response => {
+                    alert('OS criada com sucesso!');
+                    fetchOrders(); // Atualiza a tabela após a criação
+                    this.reset(); // Limpa o formulário
+                })
+                .catch(error => {
+                    alert('Erro ao criar OS: ' + error);
+                });
+        });
+
+        function fetchOrders() {
+            axios.get('http://localhost:3000/routes/orders')
+                .then(response => {
+                    const orders = response.data;
+                    const tableBody = document.getElementById('ordersTableBody');
+                    tableBody.innerHTML = ''; // Limpa a tabela antes de preencher
+
+                    orders.forEach(order => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.numeroOS}</td>
+                            <td>${order.clienteNome}</td>
+                            <td>${order.aparelho}</td>
+                            <td>${order.defeito}</td>
+                            <td>${order.pecas}</td>
+                            <td>${order.preco}</td>
+                            <td>${order.aprovacao}</td>
+                            <td>${order.pagamento}</td>
+                            <td>${order.status}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarOS('${order._id}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="deletarOS('${order._id}')"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-info btn-sm" onclick="downloadPDF('${order._id}')"><i class="fas fa-file-pdf"></i></button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar ordens de serviço: ', error);
+                });
+        }
+
+        function editarOS(id) {
+            // Implementar lógica para editar uma OS
+        }
+
+        function deletarOS(id) {
+            if (confirm('Tem certeza que deseja excluir esta OS?')) {
+                axios.delete(`http://localhost:3000/routes/orders/${id}`)
+                    .then(response => {
+                        alert('OS excluída com sucesso!');
+                        fetchOrders(); // Atualiza a tabela após a exclusão
+                    })
+                    .catch(error => {
+                        alert('Erro ao excluir OS: ' + error);
+                    });
+            }
+        }
+
+        // Chama fetchOrders ao carregar a página para preencher a tabela
+        window.onload = fetchOrders;
+
+        // Atualizar a função para editar a OS
+        async function atualizarOS(id) {
+            const osData = {
+                numeroOS: document.getElementById('numeroOS').value,
+                clienteNome: document.getElementById('clienteNome').value,
+                clienteTelefone: document.getElementById('clienteTelefone').value,
+                aparelho: document.getElementById('aparelho').value,
+                defeito: document.getElementById('defeito').value,
+                pecas: document.getElementById('pecas').value,
+                preco: document.getElementById('preco').value,
+                aprovacao: document.getElementById('aprovacao').value,
+                pagamento: document.getElementById('pagamento').value,
+                status: document.getElementById('status').value
+            };
+
+            try {
+                await axios.put(`http://localhost:3000/routes/orders/${id}`, osData);
+                alert('OS atualizada com sucesso!');
+                fetchOrders(); // Atualiza a tabela com as ordens
+                resetForm(); // Reseta o formulário
+            } catch (error) {
+                console.error('Erro ao atualizar a OS:', error);
+                alert('Erro ao atualizar a OS');
+            }
+        }
+
+        // Função para resetar o formulário
+        const resetForm = () => {
+            document.getElementById('os-form').reset();
+            const salvarBtn = document.querySelector('#os-form button[type="submit"]');
+            salvarBtn.innerHTML = '<i class="fas fa-save"></i> Salvar OS'; // Restaura o texto do botão
+            salvarBtn.onclick = null; // Remove o onclick para não chamar a função de atualização
+        };
+
+        // Modificar o evento de clique do botão "Editar"
+        async function editarOS(id) {
+            try {
+                const response = await axios.get(`http://localhost:3000/routes/orders/${id}`);
+                const order = response.data;
+
+                // Popula o formulário com os dados da ordem
+                document.getElementById('numeroOS').value = order.numeroOS;
+                document.getElementById('clienteNome').value = order.clienteNome;
+                document.getElementById('clienteTelefone').value = order.clienteTelefone;
+                document.getElementById('aparelho').value = order.aparelho;
+                document.getElementById('defeito').value = order.defeito;
+                document.getElementById('pecas').value = order.pecas;
+                document.getElementById('preco').value = order.preco;
+                document.getElementById('aprovacao').value = order.aprovacao;
+                document.getElementById('pagamento').value = order.pagamento;
+                document.getElementById('status').value = order.status;
+
+                // Atualiza o botão para indicar que estamos editando
+                const salvarBtn = document.querySelector('#os-form button[type="submit"]');
+                salvarBtn.innerHTML = '<i class="fas fa-edit"></i> Atualizar OS';
+                salvarBtn.onclick = () => atualizarOS(order._id);
+            } catch (error) {
+                console.error('Erro ao buscar a ordem de serviço para edição:', error);
+            }
+        }
+
+        async function downloadPDF(id) {
+    try {
+        const response = await axios.get(`http://localhost:3000/routes/orders/pdf/${id}`, {
+            responseType: 'blob', // Importante para download de arquivos
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `ordem_${id}.pdf`); // Nome do arquivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (error) {
+        console.error('Erro ao baixar o PDF:', error);
+        alert('Erro ao baixar o PDF');
+    }
+}
+
+function filterOrders() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#ordersTableBody tr');
+
+    rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        let matches = false;
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i].textContent.toLowerCase().includes(input)) {
+                matches = true;
+                break;
+            }
+        }
+
+        row.style.display = matches ? '' : 'none';
+    });
+}
+
+    </script>
+</body>
+
+</html>

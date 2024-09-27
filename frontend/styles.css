@@ -1,0 +1,25 @@
+body {
+    overflow-y: auto; /* Garante que a barra de rolagem apareça quando necessário */
+    background-color: #f8f9fa; /* Fundo claro para melhorar a visibilidade */
+}
+
+.container {
+    max-width: 800px; /* Limita a largura do contêiner */
+    margin: auto; /* Centraliza o contêiner */
+    padding: 20px; /* Adiciona espaçamento interno */
+    background-color: #ffffff; /* Fundo branco para o formulário */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para efeito de profundidade */
+}
+
+header {
+    margin-bottom: 30px; /* Espaçamento abaixo do cabeçalho */
+}
+
+h1, h2 {
+    color: #343a40; /* Cor do texto */
+}
+
+.btn {
+    width: 100%; /* Botão ocupa toda a largura */
+}
