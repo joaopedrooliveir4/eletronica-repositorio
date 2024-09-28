@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+      {
+        "source": "/routes/orders",
+        "destination": "/routes/orders.js"
+      }
+    ]
+  }
